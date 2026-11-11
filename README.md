@@ -54,3 +54,16 @@ Run the suite before reporting pass rates. Public demo responses can change or b
 
 ## Author
 Michael Uma — QA Automation Portfolio.
+
+
+## Continuous integration
+
+GitHub Actions runs the deterministic API-client unit tests on pushes and pull requests targeting `main`. These tests mock the HTTP session, so they validate URL construction, timeout forwarding, environment-based configuration, and request headers without depending on a live third-party API.
+
+The live JSONPlaceholder integration checks remain separate:
+
+```bash
+pytest -q api_tests/test_posts.py
+```
+
+Those integration checks require network access and depend on the public demo service being available. Treat service/network failures separately from defects in the API client.
