@@ -1,6 +1,9 @@
 import os
 from unittest.mock import Mock, patch
 
+import pytest
+from requests.exceptions import Timeout
+
 from clients.api_client import APIClient
 
 
@@ -75,3 +78,17 @@ def test_get_uses_default_timeout_and_accepts_path_without_leading_slash():
         )
 
         client.close()
+
+
+def test_get_propagates_timeout_errors():
+    with patch("clients.api_client.requests.Session") as session_factory:
+        session = session_factory.return_value
+        session.get.side_effect = Timeout("request timed out")
+
+        client = APIClient(base_url="https://example.test/api")
+
+        with pytest.raises(Timeout, match="request timed out"):
+            client.get("/posts")
+
+        client.close()
+        session.close.assert_called_once_with()
