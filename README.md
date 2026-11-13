@@ -46,6 +46,8 @@ pytest
 ## Test coverage
 Collection retrieval, single-resource retrieval, unknown-resource response, JSON structure, and a simple response-time threshold.
 
+The deterministic API-client unit suite also verifies base URL normalization, environment-variable precedence, URL construction, timeout forwarding, session headers and cleanup, and propagation of `requests.Timeout` exceptions. The client does not silently suppress request exceptions; calling code should handle them according to the application's retry and error-reporting policy.
+
 ## Engineering practices
 Use deterministic assertions, short timeouts, isolated test data, environment-based configuration, and secret redaction. Network/service outages should be distinguished from application defects.
 
@@ -54,3 +56,16 @@ Run the suite before reporting pass rates. Public demo responses can change or b
 
 ## Author
 Michael Uma — QA Automation Portfolio.
+
+
+## Continuous integration
+
+GitHub Actions runs the deterministic API-client unit tests on pushes and pull requests targeting `main`. These tests mock the HTTP session, so they validate URL construction, timeout forwarding, environment-based configuration, request headers, and timeout-exception propagation without depending on a live third-party API.
+
+The live JSONPlaceholder integration checks remain separate:
+
+```bash
+pytest -q api_tests/test_posts.py
+```
+
+Those integration checks require network access and depend on the public demo service being available. Treat service/network failures separately from defects in the API client.
